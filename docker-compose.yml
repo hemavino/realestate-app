@@ -1,0 +1,61 @@
+services:
+  # SQL Server Database
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: realestate-db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong@Password123
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - realestate-network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong@Password123 -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  # Backend API
+  backend:
+    build:
+      context: ./realestate-backend
+      dockerfile: RealEstate.Api/Dockerfile
+    container_name: realestate-backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=db;Database=RealEstateDb;User Id=sa;Password=YourStrong@Password123;TrustServerCertificate=True;
+    ports:
+      - "5000:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - realestate-network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ./realestate-frontend
+      dockerfile: Dockerfile
+    container_name: realestate-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - realestate-network
+    restart: unless-stopped
+
+volumes:
+  sqlserver-data:
+
+networks:
+  realestate-network:
+    driver: bridge
