@@ -148,10 +148,10 @@ Passwords must contain:
 | # | Assumption / Trade-off |
 |---|---|
 | 1 | **LocalDB** is used as the default database for development simplicity.|
-| 2 | **Authorization** is ownership-based — only the user who created a property can update or delete it. There is no admin role. |
+| 2 | **Authorization** is ownership-based — only the user who created a property can update or delete it. No admin role was created as of now. |
 | 3 | **Property types** are restricted to `Apartment`, `Villa`, and `Land` via validation. This can be extended to a lookup table if needed. |
-| 4 | **Global exception middleware** handles all unhandled exceptions and returns a standardized JSON error response. Stack traces are only included in `Development` environment. |
-| 5 | **CORS** is configured to allow only the origins listed in `AllowedOrigins` in `appsettings.json`.
-| 6 | **Passwords** are hashed using BCrypt before storage. Plain-text passwords are never persisted. |
+| 4 | **Global exception middleware** is implemented. |
+| 5 | **CORS** is configured in `appsettings.json`.
+| 6 | **Passwords** are hashed using BCrypt before storage. |
 
 ---
